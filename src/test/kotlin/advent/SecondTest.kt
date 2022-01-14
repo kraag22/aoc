@@ -7,7 +7,7 @@ internal class SecondTest {
     @Test
     fun itWorksTest() {
         val s = Second()
-        s.loadFile("/2_example.txt")
+        s.extract("/2_example.txt")
 
         assertThat(s.commands).hasSize(6)
         assertThat(s.commands.first().value).isEqualTo(5)
@@ -16,7 +16,7 @@ internal class SecondTest {
     @Test
     fun computeSimpleTest() {
         val s = Second()
-        s.loadFile("/2_example.txt")
+        s.extract("/2_example.txt")
 
         assertThat(s.computeSimple()).isEqualTo(150)
     }
@@ -24,7 +24,7 @@ internal class SecondTest {
     @Test
     fun computeSimpleOnRealDataTest() {
         val s = Second()
-        s.loadFile("/2.txt")
+        s.extract("/2.txt")
 
         assertThat(s.computeSimple()).isEqualTo(2091984)
     }
@@ -32,7 +32,7 @@ internal class SecondTest {
     @Test
     fun computeWithAimOnExampleDataTest() {
         val s = Second()
-        s.loadFile("/2_example.txt")
+        s.extract("/2_example.txt")
 
         assertThat(s.computeWithAim()).isEqualTo(900)
     }
@@ -40,7 +40,7 @@ internal class SecondTest {
     @Test
     fun computeWithAimOnRealDataTest() {
         val s = Second()
-        s.loadFile("/2.txt")
+        s.extract("/2.txt")
 
         assertThat(s.computeWithAim()).isEqualTo(2086261056)
     }

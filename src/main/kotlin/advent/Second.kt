@@ -3,11 +3,7 @@ package advent
 class Second: Base() {
     var commands = listOf<Command>()
 
-    fun loadFile(resource: String) {
-        loadData(readData(resource))
-    }
-
-    fun loadData(lines: List<String>) {
+    override fun parseAndStore(lines: List<String>) {
         commands = lines.map {
             val args = it.split(' ')
             Command.from(args[0], args[1].toInt())
@@ -15,39 +11,26 @@ class Second: Base() {
     }
 
     fun computeSimple():Int {
-        var x = 0
-        var y = 0
-
-        commands.forEach { command ->
-            x += command.getXdelta()
-            y += command.getYdelta()
-        }
-
-        return x * y
+        val context = Context()
+        commands.forEach { it.execute(context) }
+        return context.compute()
     }
 
     fun computeWithAim(): Int {
-        var x = 0
-        var y = 0
-        var aim = 0
+        val context = Context(computeWithAim = true)
+        commands.forEach { it.execute(context) }
+        return context.compute()
+    }
+}
 
-        commands.forEach { command ->
-            x += command.getXdelta(aim)
-            y += command.getYdelta(aim)
-            aim += command.getAimDelta(aim)
-        }
-
+data class Context(var x: Int = 0, var y: Int = 0, var aim: Int = 0, val computeWithAim: Boolean = false) {
+    fun compute(): Int {
         return x * y
     }
 }
 
 sealed class Command(val value: Int) {
-    abstract fun getXdelta(): Int
-    abstract fun getYdelta(): Int
-
-    abstract fun getXdelta(aim: Int): Int
-    abstract fun getYdelta(aim: Int): Int
-    abstract fun getAimDelta(aim: Int): Int
+    abstract fun execute(context: Context)
 
     companion object {
         fun from(cmd: String, value: Int): Command {
@@ -62,65 +45,28 @@ sealed class Command(val value: Int) {
 }
 
 class ForwardCommand(value:Int): Command(value) {
-    override fun getXdelta(): Int {
-        return value
-    }
-
-    override fun getXdelta(aim: Int): Int {
-        return value
-    }
-
-    override fun getYdelta(): Int {
-        return 0
-    }
-
-    override fun getYdelta(aim: Int): Int {
-        return value * aim
-    }
-
-    override fun getAimDelta(aim: Int): Int {
-        return 0
+    override fun execute(context: Context) {
+        context.x += value
+        if (context.computeWithAim) {
+            context.y += value * context.aim
+        }
     }
 }
 class UpCommand(value:Int): Command(value) {
-    override fun getXdelta(): Int {
-        return 0
-    }
-
-    override fun getXdelta(aim: Int): Int {
-        return 0
-    }
-
-    override fun getYdelta(): Int {
-        return -value
-    }
-
-    override fun getYdelta(aim: Int): Int {
-        return 0
-    }
-
-    override fun getAimDelta(aim: Int): Int {
-        return -value
+    override fun execute(context: Context) {
+        if (context.computeWithAim) {
+            context.aim -= value
+        } else {
+            context.y -= value
+        }
     }
 }
 class DownCommand(value:Int): Command(value) {
-    override fun getXdelta(): Int {
-        return 0
-    }
-
-    override fun getXdelta(aim: Int): Int {
-        return 0
-    }
-
-    override fun getYdelta(): Int {
-        return value
-    }
-
-    override fun getYdelta(aim: Int): Int {
-        return 0
-    }
-
-    override fun getAimDelta(aim: Int): Int {
-        return value
+    override fun execute(context: Context) {
+        if (context.computeWithAim) {
+            context.aim += value
+        } else {
+            context.y += value
+        }
     }
 }
