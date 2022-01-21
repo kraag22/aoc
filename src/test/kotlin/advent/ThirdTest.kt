@@ -1,7 +1,6 @@
 package advent
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class ThirdTest {
@@ -11,8 +10,7 @@ internal class ThirdTest {
         val byteArray = ByteArray(6) {
             if (it.mod(2) == 0) {
                 0
-            }
-            else {
+            } else {
                 1
             }
         }
@@ -58,6 +56,38 @@ internal class ThirdTest {
         val t = Third()
         t.extract("/3.txt")
         assertThat(t.compute()).isEqualTo(845186)
+    }
+
+    @Test
+    fun `oxygen generator rating on example data`() {
+        val t = Third()
+        t.extract("/3_example.txt")
+
+        assertThat(t.getOxygen()).isEqualTo("10111")
+    }
+
+    @Test
+    fun `CO2 scrubber rating on example data`() {
+        val t = Third()
+        t.extract("/3_example.txt")
+
+        assertThat(t.getCO2Rating()).isEqualTo("01010")
+    }
+
+    @Test
+    fun `get life support rating on example data`() {
+        val t = Third()
+        t.extract("/3_example.txt")
+
+        assertThat(t.funGetLifeSupportRating()).isEqualTo(230)
+    }
+
+    @Test
+    fun `get life support on real data`() {
+        val t = Third()
+        t.extract("/3.txt")
+
+        assertThat(t.funGetLifeSupportRating()).isEqualTo(4636702)
     }
 }
 
