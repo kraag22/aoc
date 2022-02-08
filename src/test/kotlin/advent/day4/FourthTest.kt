@@ -1,28 +1,30 @@
-package advent
+package advent.day4
 
-import org.assertj.core.api.Assertions.assertThat
+import advent.Base
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class FourthTest {
     val data = Base.readData("/4.txt")
     val fourth = Fourth()
+
     init {
         fourth.loadBoards(data)
     }
 
     @Test
     fun readDataTest() {
-        assertThat(data.size).isEqualTo(19)
+        Assertions.assertThat(data.size).isEqualTo(19)
     }
 
     @Test
     fun readLotteryTickersTest() {
-        assertThat(fourth.lotteryNumbers).hasSize(27)
+        Assertions.assertThat(fourth.lotteryNumbers).hasSize(27)
     }
 
     @Test
     fun canLoadBoardsTest() {
-        assertThat(fourth.boards).hasSize(3)
+        Assertions.assertThat(fourth.boards).hasSize(3)
     }
 
     @Test
@@ -34,10 +36,10 @@ internal class FourthTest {
             20 11 10 -1  4
             14 21 16 -1  6
         """.trimIndent()
-        assertThat(matrix.split("\n")).hasSize(5)
+        Assertions.assertThat(matrix.split("\n")).hasSize(5)
         val board = Board(matrix.split("\n"))
-        assertThat(board.score(1)).isEqualTo(213)
-        assertThat(board.score(2)).isEqualTo(426)
+        Assertions.assertThat(board.score(1)).isEqualTo(213)
+        Assertions.assertThat(board.score(2)).isEqualTo(426)
     }
 
     @Test
@@ -49,12 +51,12 @@ internal class FourthTest {
             20 11 10 -1  4
             14 21 16 -1  6
         """.trimIndent()
-        assertThat(matrix.split("\n")).hasSize(5)
+        Assertions.assertThat(matrix.split("\n")).hasSize(5)
         val board = Board(matrix.split("\n"))
-        assertThat(board.hasBingo()).isTrue
-        assertThat(board.hasBingoInLine(2)).isTrue
-        assertThat(board.hasBingoInLine(1)).isFalse
-        assertThat(board.hasBingoInColumn(4)).isTrue
-        assertThat(board.hasBingoInColumn(5)).isFalse
+        Assertions.assertThat(board.hasBingo()).isTrue
+        Assertions.assertThat(board.hasBingoInLine(2)).isTrue
+        Assertions.assertThat(board.hasBingoInLine(1)).isFalse
+        Assertions.assertThat(board.hasBingoInColumn(4)).isTrue
+        Assertions.assertThat(board.hasBingoInColumn(5)).isFalse
     }
 }

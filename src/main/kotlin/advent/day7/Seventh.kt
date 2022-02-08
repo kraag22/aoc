@@ -1,8 +1,9 @@
-package advent
+package advent.day7
 
+import advent.Base
 import kotlin.math.abs
 
-class Seventh: Base() {
+class Seventh : Base() {
     var rows = mutableListOf<Int>()
 
     fun loadFile(resource: String) {
@@ -13,7 +14,7 @@ class Seventh: Base() {
         rows = line.split(',').map { it.toInt() }.toMutableList()
     }
 
-    fun computeFuelForColumnOnePerStep(column: Int):Int {
+    fun computeFuelForColumnOnePerStep(column: Int): Int {
         var fuel = 0
 
         rows.forEach {
@@ -22,25 +23,24 @@ class Seventh: Base() {
         return fuel
     }
 
-    fun computeFuelForColumnWithIncreasingCost(column: Int):Int {
+    fun computeFuelForColumnWithIncreasingCost(column: Int): Int {
         var fuel = 0
 
         rows.forEach {
             val steps = abs(column - it)
-            fuel += steps* (steps + 1) / 2
+            fuel += steps * (steps + 1) / 2
         }
         return fuel
     }
 
     fun bruteForce(increasingFuel: Boolean = false): Int? {
         val fuelCost = mutableListOf<Pair<Int, Int>>()
-        val min =  rows.minOrNull()
+        val min = rows.minOrNull()
         val max = rows.maxOrNull()
 
         if (min != null && max != null) {
-            for (i in min .. max) {
-                val fuel = if(increasingFuel)
-                {
+            for (i in min..max) {
+                val fuel = if (increasingFuel) {
                     computeFuelForColumnWithIncreasingCost(i)
                 } else {
                     computeFuelForColumnOnePerStep(i)

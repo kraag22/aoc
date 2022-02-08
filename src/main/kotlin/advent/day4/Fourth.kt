@@ -1,6 +1,8 @@
-package advent
+package advent.day4
 
-class Fourth: Base() {
+import advent.Base
+
+class Fourth : Base() {
     val boards = mutableListOf<Board>()
     var lotteryNumbers = mutableListOf<Int>()
 
@@ -71,9 +73,9 @@ class Board(numbers: List<String>) {
         return sum * number
     }
 
-    fun hasBingo():Boolean {
+    fun hasBingo(): Boolean {
         var bingo = false
-        for(i in 1..5) {
+        for (i in 1..5) {
             if (hasBingoInLine(i)) {
                 bingo = true
                 break
@@ -97,7 +99,7 @@ class Board(numbers: List<String>) {
 
     fun hasBingoInLine(lineNo: Int): Boolean {
         val start = (lineNo - 1) * 5
-        val line = data.filterIndexed { index, value -> index >= start && index < start +5 && value == -1 }
+        val line = data.filterIndexed { index, value -> index >= start && index < start + 5 && value == -1 }
         return line.size == 5
     }
 
@@ -107,12 +109,12 @@ class Board(numbers: List<String>) {
         return line.size == 5
     }
 
-    private fun trimSpaces(input: String):String {
-       return input.replace("\\s+".toRegex(), " ").trim()
+    private fun trimSpaces(input: String): String {
+        return input.replace("\\s+".toRegex(), " ").trim()
     }
 
     fun printBoard() {
         println("------------")
-        data.toList().windowed(5,5).forEach { println("${it.joinToString( " ")},") }
+        data.toList().windowed(5, 5).forEach { println("${it.joinToString(" ")},") }
     }
 }

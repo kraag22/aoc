@@ -1,24 +1,24 @@
-package advent
+package advent.day11
 
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class EleventhTest {
     @Test
     fun eleventhClassTest() {
         val el = Eleventh()
-        assertThat(el).isInstanceOf(Eleventh::class.java)
+        Assertions.assertThat(el).isInstanceOf(Eleventh::class.java)
     }
 
     @Test
     fun loadTest() {
         val el = Eleventh(10)
-        assertThat(el.grid[0][0]).isEqualTo(-1)
-        assertThat(el.grid[9][9]).isEqualTo(-1)
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(-1)
+        Assertions.assertThat(el.grid[9][9]).isEqualTo(-1)
 
         el.load("/11_intro.txt")
-        assertThat(el.grid[0][0]).isEqualTo(5)
-        assertThat(el.grid[9][9]).isEqualTo(6)
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(5)
+        Assertions.assertThat(el.grid[9][9]).isEqualTo(6)
     }
 
     @Test
@@ -30,30 +30,30 @@ internal class EleventhTest {
         el.increase(0, -1)
         el.increase(0, 10)
         el.increase(10, 0)
-        assertThat(el.grid[0][0]).isEqualTo(6)
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(6)
         el.grid[0][0] = 0
         el.increase(0, 0)
-        assertThat(el.grid[0][0]).isEqualTo(0)
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(0)
 
         el.increase(0, 0, true)
-        assertThat(el.grid[0][0]).isEqualTo(1)
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(1)
 
         el.increaseAll()
-        assertThat(el.grid[3][3]).isEqualTo(2)
-        assertThat(el.grid[9][9]).isEqualTo(7)
+        Assertions.assertThat(el.grid[3][3]).isEqualTo(2)
+        Assertions.assertThat(el.grid[9][9]).isEqualTo(7)
     }
 
     @Test
     fun tryFlashingWorkWhenNothingHappensTest() {
         val el = Eleventh(10)
         el.load("/11_intro.txt")
-        assertThat(el.tryFlashing(0, 0)).isFalse
-        assertThat(el.grid[0][0]).isEqualTo(5)
-        assertThat(el.grid[0][1]).isEqualTo(4)
-        assertThat(el.grid[1][0]).isEqualTo(2)
+        Assertions.assertThat(el.tryFlashing(0, 0)).isFalse
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(5)
+        Assertions.assertThat(el.grid[0][1]).isEqualTo(4)
+        Assertions.assertThat(el.grid[1][0]).isEqualTo(2)
 
-        assertThat(el.tryFlashing(-10, -10)).isFalse
-        assertThat(el.tryFlashing(10, 110)).isFalse
+        Assertions.assertThat(el.tryFlashing(-10, -10)).isFalse
+        Assertions.assertThat(el.tryFlashing(10, 110)).isFalse
     }
 
     @Test
@@ -62,11 +62,11 @@ internal class EleventhTest {
         el.load("/11_intro.txt")
         el.grid[0][0] = 10
 
-        assertThat(el.tryFlashing(0, 0)).isTrue
-        assertThat(el.grid[0][0]).isEqualTo(0)
-        assertThat(el.grid[0][1]).isEqualTo(5)
-        assertThat(el.grid[1][0]).isEqualTo(3)
-        assertThat(el.grid[1][1]).isEqualTo(8)
+        Assertions.assertThat(el.tryFlashing(0, 0)).isTrue
+        Assertions.assertThat(el.grid[0][0]).isEqualTo(0)
+        Assertions.assertThat(el.grid[0][1]).isEqualTo(5)
+        Assertions.assertThat(el.grid[1][0]).isEqualTo(3)
+        Assertions.assertThat(el.grid[1][1]).isEqualTo(8)
     }
 
     @Test
@@ -75,19 +75,19 @@ internal class EleventhTest {
         el.load("/11_intro.txt")
         el.grid[4][4] = 10
 
-        assertThat(el.tryFlashing(4, 4)).isTrue
-        assertThat(el.grid[3][3]).isEqualTo(2)
-        assertThat(el.grid[3][4]).isEqualTo(4)
-        assertThat(el.grid[3][5]).isEqualTo(4)
+        Assertions.assertThat(el.tryFlashing(4, 4)).isTrue
+        Assertions.assertThat(el.grid[3][3]).isEqualTo(2)
+        Assertions.assertThat(el.grid[3][4]).isEqualTo(4)
+        Assertions.assertThat(el.grid[3][5]).isEqualTo(4)
 
-        assertThat(el.grid[4][3]).isEqualTo(8)
-        assertThat(el.grid[4][5]).isEqualTo(9)
+        Assertions.assertThat(el.grid[4][3]).isEqualTo(8)
+        Assertions.assertThat(el.grid[4][5]).isEqualTo(9)
 
-        assertThat(el.grid[5][3]).isEqualTo(8)
-        assertThat(el.grid[5][4]).isEqualTo(6)
-        assertThat(el.grid[5][5]).isEqualTo(3)
+        Assertions.assertThat(el.grid[5][3]).isEqualTo(8)
+        Assertions.assertThat(el.grid[5][4]).isEqualTo(6)
+        Assertions.assertThat(el.grid[5][5]).isEqualTo(3)
 
-        assertThat(el.grid[4][4]).isEqualTo(0)
+        Assertions.assertThat(el.grid[4][4]).isEqualTo(0)
 
         el.printGrid()
     }
@@ -97,7 +97,7 @@ internal class EleventhTest {
         val el = Eleventh(10)
         el.load("/11_intro.txt")
 
-        assertThat(el.doOneStep()).isEqualTo(0)
+        Assertions.assertThat(el.doOneStep()).isEqualTo(0)
 
         val check = Eleventh(10)
         check.storeLines(
@@ -115,7 +115,7 @@ internal class EleventhTest {
             )
         )
 
-        assertThat(el.grid).isEqualTo(check.grid)
+        Assertions.assertThat(el.grid).isEqualTo(check.grid)
     }
 
     @Test
@@ -136,7 +136,7 @@ internal class EleventhTest {
             )
         )
 
-        assertThat(el.doOneStep()).isEqualTo(35)
+        Assertions.assertThat(el.doOneStep()).isEqualTo(35)
 
         val check = Eleventh(10)
         check.storeLines(
@@ -154,7 +154,7 @@ internal class EleventhTest {
             )
         )
 
-        assertThat(el.grid).isEqualTo(check.grid)
+        Assertions.assertThat(el.grid).isEqualTo(check.grid)
     }
 
     @Test
@@ -162,7 +162,7 @@ internal class EleventhTest {
         val el = Eleventh(10)
         el.load("/11_intro.txt")
 
-        assertThat(el.doSteps(10)).isEqualTo(204)
+        Assertions.assertThat(el.doSteps(10)).isEqualTo(204)
 
         val check = Eleventh(10)
         check.storeLines(
@@ -180,7 +180,7 @@ internal class EleventhTest {
             )
         )
 
-        assertThat(el.grid).isEqualTo(check.grid)
+        Assertions.assertThat(el.grid).isEqualTo(check.grid)
     }
 
     @Test
@@ -188,7 +188,7 @@ internal class EleventhTest {
         val el = Eleventh(10)
         el.load("/11_intro.txt")
 
-        assertThat(el.doSteps(100)).isEqualTo(1656)
+        Assertions.assertThat(el.doSteps(100)).isEqualTo(1656)
 
         val check = Eleventh(10)
         check.storeLines(
@@ -206,7 +206,7 @@ internal class EleventhTest {
             )
         )
 
-        assertThat(el.grid).isEqualTo(check.grid)
+        Assertions.assertThat(el.grid).isEqualTo(check.grid)
     }
 
     @Test
@@ -214,7 +214,7 @@ internal class EleventhTest {
         val el = Eleventh(10)
         el.load("/11_first.txt")
 
-        assertThat(el.doSteps(100)).isEqualTo(1669)
+        Assertions.assertThat(el.doSteps(100)).isEqualTo(1669)
     }
 
     @Test
@@ -222,7 +222,7 @@ internal class EleventhTest {
         val el = Eleventh(10)
         el.load("/11_intro.txt")
 
-        assertThat(el.findAllFlashing()).isEqualTo(195)
+        Assertions.assertThat(el.findAllFlashing()).isEqualTo(195)
     }
 
     @Test
@@ -230,6 +230,6 @@ internal class EleventhTest {
         val el = Eleventh(10)
         el.load("/11_first.txt")
 
-        assertThat(el.findAllFlashing()).isEqualTo(351)
+        Assertions.assertThat(el.findAllFlashing()).isEqualTo(351)
     }
 }

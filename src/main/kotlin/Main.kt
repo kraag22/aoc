@@ -1,5 +1,4 @@
-import advent.First
-import advent.Fourth
+import advent.day4.Fourth
 
 fun main(args: Array<String>) {
     doAoC()

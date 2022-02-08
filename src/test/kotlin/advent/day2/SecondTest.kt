@@ -1,6 +1,7 @@
-package advent
+package advent.day2
 
-import org.assertj.core.api.Assertions.assertThat
+import advent.Second
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class SecondTest {
@@ -9,8 +10,8 @@ internal class SecondTest {
         val s = Second()
         s.extract("/2_example.txt")
 
-        assertThat(s.commands).hasSize(6)
-        assertThat(s.commands.first().value).isEqualTo(5)
+        Assertions.assertThat(s.commands).hasSize(6)
+        Assertions.assertThat(s.commands.first().value).isEqualTo(5)
     }
 
     @Test
@@ -18,7 +19,7 @@ internal class SecondTest {
         val s = Second()
         s.extract("/2_example.txt")
 
-        assertThat(s.computeSimple()).isEqualTo(150)
+        Assertions.assertThat(s.computeSimple()).isEqualTo(150)
     }
 
     @Test
@@ -26,7 +27,7 @@ internal class SecondTest {
         val s = Second()
         s.extract("/2.txt")
 
-        assertThat(s.computeSimple()).isEqualTo(2091984)
+        Assertions.assertThat(s.computeSimple()).isEqualTo(2091984)
     }
 
     @Test
@@ -34,7 +35,7 @@ internal class SecondTest {
         val s = Second()
         s.extract("/2_example.txt")
 
-        assertThat(s.computeWithAim()).isEqualTo(900)
+        Assertions.assertThat(s.computeWithAim()).isEqualTo(900)
     }
 
     @Test
@@ -42,6 +43,6 @@ internal class SecondTest {
         val s = Second()
         s.extract("/2.txt")
 
-        assertThat(s.computeWithAim()).isEqualTo(2086261056)
+        Assertions.assertThat(s.computeWithAim()).isEqualTo(2086261056)
     }
 }

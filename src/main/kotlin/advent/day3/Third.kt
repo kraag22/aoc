@@ -1,4 +1,6 @@
-package advent
+package advent.day3
+
+import advent.Base
 
 class Third : Base() {
     var columns = mutableListOf<ByteArray>()

@@ -1,6 +1,8 @@
-package advent
+package advent.day1
 
-class First: Base() {
+import advent.Base
+
+class First : Base() {
     private val depths = listOf(199, 200, 208, 210, 200, 207, 240, 269, 260, 263)
     fun run() {
         getIncreases(getTriplets(depths))

@@ -1,4 +1,6 @@
-package advent
+package advent.day11
+
+import advent.Base
 
 class Eleventh(private val gridSize: Int = 10) : Base() {
     val grid = Array(gridSize) {

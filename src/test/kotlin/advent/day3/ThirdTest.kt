@@ -1,4 +1,4 @@
-package advent
+package advent.day3
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -90,5 +90,3 @@ internal class ThirdTest {
         assertThat(t.funGetLifeSupportRating()).isEqualTo(4636702)
     }
 }
-
-

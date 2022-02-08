@@ -1,9 +1,8 @@
-package advent
+package advent.day17
 
 import kotlin.math.max
 
-
-class Seventeenth(val targetX:Pair<Int, Int>, val targetY:Pair<Int, Int>) {
+class Seventeenth(val targetX: Pair<Int, Int>, val targetY: Pair<Int, Int>) {
 
     fun getMaxVelocityForX(): Int {
         var sum = 0
@@ -37,7 +36,7 @@ class Seventeenth(val targetX:Pair<Int, Int>, val targetY:Pair<Int, Int>) {
             16 to -120
         )
         val result = (y - subtract[maxX]!!) / maxX.toFloat()
-        return kotlin.math.ceil( result ).toInt()
+        return kotlin.math.ceil(result).toInt()
     }
 
     fun proccessHits(): Int {
@@ -48,7 +47,7 @@ class Seventeenth(val targetX:Pair<Int, Int>, val targetY:Pair<Int, Int>) {
         for (x in xMin..targetX.second) {
             for (y in yMax downTo targetY.first) {
 //                println("shooting [$x,$y]")
-                if (calculateMaxHeight(x,y) != -1) {
+                if (calculateMaxHeight(x, y) != -1) {
                     println("[$x, $y] hit")
                     hits++
                 }
@@ -70,7 +69,7 @@ class Seventeenth(val targetX:Pair<Int, Int>, val targetY:Pair<Int, Int>) {
 //            yMax = max(y1, y2, 50)
             for (y in yMax downTo 0) {
 //                println("shooting [$x,$y]")
-                val height = calculateMaxHeight(x,y)
+                val height = calculateMaxHeight(x, y)
                 if (height > maxHeight) {
                     println("[$x, $y] localMax: $height")
                     maxHeight = height
@@ -92,25 +91,25 @@ class Seventeenth(val targetX:Pair<Int, Int>, val targetY:Pair<Int, Int>) {
             positionY += currentY
             maxY = max(maxY, positionY)
             if (hit(positionX, positionY)) {
-               return maxY
+                return maxY
             }
 
-            if (currentX > 0 ) {
+            if (currentX > 0) {
                 currentX--
             }
             currentY--
 
             if (outOfBounds(positionX, positionY)) {
-               return -1
+                return -1
             }
         }
     }
 
-    fun outOfBounds(x: Int, y:Int):Boolean {
+    fun outOfBounds(x: Int, y: Int): Boolean {
         return x > targetX.second || y < targetY.first
     }
 
-    fun hit(x: Int, y:Int):Boolean {
-        return (targetX.first <= x && x <= targetX.second && targetY.first <= y && y <= targetY.second )
+    fun hit(x: Int, y: Int): Boolean {
+        return (targetX.first <= x && x <= targetX.second && targetY.first <= y && y <= targetY.second)
     }
 }

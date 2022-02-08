@@ -1,6 +1,6 @@
-package advent
+package advent.day7
 
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class SeventhTest {
@@ -10,7 +10,7 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadFile("/7_example.txt")
 
-        assertThat(s.rows).hasSize(10)
+        Assertions.assertThat(s.rows).hasSize(10)
     }
 
     @Test
@@ -18,7 +18,7 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadData("1,2,3,4")
 
-        assertThat(s.rows).isEqualTo(listOf(1,2,3,4))
+        Assertions.assertThat(s.rows).isEqualTo(listOf(1, 2, 3, 4))
     }
 
     @Test
@@ -26,7 +26,7 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadData("1,2,3,4,5,6")
 
-        assertThat(s.computeFuelForColumnOnePerStep(1)).isEqualTo(15)
+        Assertions.assertThat(s.computeFuelForColumnOnePerStep(1)).isEqualTo(15)
     }
 
     @Test
@@ -34,7 +34,7 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadFile("/7_example.txt")
 
-        assertThat(s.bruteForce()).isEqualTo(37)
+        Assertions.assertThat(s.bruteForce()).isEqualTo(37)
     }
 
     @Test
@@ -42,17 +42,17 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadFile("/7.txt")
 
-        assertThat(s.bruteForce()).isEqualTo(328187)
+        Assertions.assertThat(s.bruteForce()).isEqualTo(328187)
     }
 
     @Test
     fun `Compute fuel cost with increasing spending per move`() {
         val s = Seventh()
         s.loadData("1,4")
-        assertThat(s.computeFuelForColumnWithIncreasingCost(1)).isEqualTo(6)
+        Assertions.assertThat(s.computeFuelForColumnWithIncreasingCost(1)).isEqualTo(6)
 
         s.loadData("16,5")
-        assertThat(s.computeFuelForColumnWithIncreasingCost(16)).isEqualTo(66)
+        Assertions.assertThat(s.computeFuelForColumnWithIncreasingCost(16)).isEqualTo(66)
     }
 
     @Test
@@ -60,7 +60,7 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadFile("/7_example.txt")
 
-        assertThat(s.bruteForce(true)).isEqualTo(168)
+        Assertions.assertThat(s.bruteForce(true)).isEqualTo(168)
     }
 
     @Test
@@ -68,6 +68,6 @@ internal class SeventhTest {
         val s = Seventh()
         s.loadFile("/7.txt")
 
-        assertThat(s.bruteForce(true)).isEqualTo(91257582)
+        Assertions.assertThat(s.bruteForce(true)).isEqualTo(91257582)
     }
 }
