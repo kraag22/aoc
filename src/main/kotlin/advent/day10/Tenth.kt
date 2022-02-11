@@ -1,6 +1,7 @@
 package advent.day10
 
 import advent.Base
+import java.math.BigInteger
 
 class Tenth : Base() {
     val data = mutableListOf<String>()
@@ -8,7 +9,7 @@ class Tenth : Base() {
         data.addAll(lines)
     }
 
-    fun processLine(line: String): String {
+    fun processLine(line: String): List<String> {
         val openings = mutableListOf<String>()
 
         line.chunked(1).forEach {
@@ -18,19 +19,31 @@ class Tenth : Base() {
                 if (it.isClosureOf(openings.last())) {
                     openings.removeLast()
                 } else {
-                    return it
+                    return listOf(it)
                 }
             }
         }
 
-        return if (openings.isEmpty()) "o" else "i"
+        return if (openings.isEmpty()) openings else openings.reversed().map { it.flipBracket() }
     }
 
     fun computeScore(): Int {
         return data.map { processLine(it) }
-            .filter { it != "o" && it != "i" }
-            .fold(0) { acc, closure ->
-                acc + closure.getScore()
+            .filter { it.size == 1 }
+            .map { it.first() }
+            .fold(0) { acc, s ->
+                acc + s.getScore()
+            }
+    }
+
+    fun getScoreOnIncompleteLines(): BigInteger {
+        return data.map { processLine(it) }
+            .filter { it.size > 1 }
+            .map { it.getScore() }
+            .sorted()
+            .let {
+                check(it.size.mod(2) == 1) { "Size of output list has to be odd" }
+                it[it.size.floorDiv(2)]
             }
     }
 }
@@ -45,13 +58,31 @@ fun String.getScore(): Int {
     }
 }
 
+fun String.getSecondScore(): BigInteger {
+    return when (this) {
+        "}" -> 3.toBigInteger()
+        "]" -> 2.toBigInteger()
+        ")" -> 1.toBigInteger()
+        ">" -> 4.toBigInteger()
+        else -> throw Exception("Wrong character to second score: $this")
+    }
+}
+
+fun List<String>.getScore(): BigInteger = this.fold(BigInteger.ZERO) { acc, item ->
+    acc * 5.toBigInteger() + item.getSecondScore()
+}
+
 fun String.isOpening() = listOf("[", "{", "(", "<").contains(this)
 fun String.isClosureOf(opening: String): Boolean {
+    return opening.flipBracket() == this
+}
+
+fun String.flipBracket(): String {
     return when (this) {
-        "}" -> opening == "{"
-        "]" -> opening == "["
-        ")" -> opening == "("
-        ">" -> opening == "<"
-        else -> false
+        "{" -> "}"
+        "[" -> "]"
+        "(" -> ")"
+        "<" -> ">"
+        else -> throw Exception("Wrong bracket:$this")
     }
 }
