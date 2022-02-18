@@ -52,18 +52,23 @@ class Fifteenth(private val gridSize: Int = 10) : Base() {
     }
 
     fun compute() {
-        var toProcess = mutableListOf(Pair(0, 0))
+        val toProcess = mutableListOf(Pair(0, 0))
 
         while (toProcess.isNotEmpty()) {
-            val point = toProcess.removeFirst()
+            var min = Pair(-1, Int.MAX_VALUE)
+            toProcess.forEachIndexed { idx, it ->
+                val x = gridValues[it.first][it.second] + (gridPath.getMinNeighboursPath(it) ?: 0)
+                if (x < min.second) {
+                    min = Pair(idx, x)
+                }
+            }
+
+            val point = toProcess.removeAt(min.first)
+
             gridPath.fillPathForPoint(gridValues, point)
             gridPath.getNotVisitedNeighbours(point).forEach { neighbour ->
                 if (!toProcess.contains(neighbour)) toProcess.add(neighbour)
             }
-            toProcess =
-                toProcess
-                    .sortedBy { gridValues[it.first][it.second] + (gridPath.getMinNeighboursPath(it) ?: 0) }
-                    .toMutableList()
         }
     }
 
