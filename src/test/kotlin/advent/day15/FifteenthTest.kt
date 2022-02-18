@@ -62,4 +62,37 @@ internal class FifteenthTest {
         assertThat(f.getMinPathValue()).isEqualTo(462)
     }
 
+    @Test
+    fun `extending example data five times should work`() {
+        val f = Fifteenth(50)
+        f.extract("/15_example.txt")
+        f.fillBlock(Pair(0, 0), Pair(10, 0), 10)
+
+        assertThat(f.gridValues[0][0]).isEqualTo(f.gridValues[10][0] - 1)
+        f.extendFiveTimes()
+
+        assertThat(f.gridValues[49][49]).isEqualTo(9)
+        assertThat(f.gridValues[48][49]).isEqualTo(7)
+        assertThat(f.gridValues[49][47]).isEqualTo(8)
+    }
+
+    @Test
+    fun `compute path on extended example data`() {
+        val f = Fifteenth(50)
+        f.extract("/15_example.txt")
+        f.extendFiveTimes()
+        f.compute()
+
+        assertThat(f.getMinPathValue()).isEqualTo(315)
+    }
+
+    @Test
+    fun `compute path on extended input data`() {
+        val f = Fifteenth(500)
+        f.extract("/15.txt")
+        f.extendFiveTimes()
+        f.compute()
+
+        assertThat(f.getMinPathValue()).isEqualTo(2846)
+    }
 }

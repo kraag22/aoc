@@ -28,16 +28,40 @@ class Fifteenth(private val gridSize: Int = 10) : Base() {
         }
     }
 
+    fun fillBlock(origin: Pair<Int, Int>, fill: Pair<Int, Int>, size: Int) {
+        for (x in (0 until size)) {
+            for (y in (0 until size)) {
+                val originalValue = gridValues[origin.first + x][origin.second + y]
+                gridValues[fill.first + x][fill.second + y] = if (originalValue == 9) 1 else originalValue + 1
+                gridPath[fill.first + x][fill.second + y] = -1
+            }
+        }
+    }
+
+    fun extendFiveTimes() {
+        val blockSize = this.gridSize / 5
+        for (i in (1 until 5)) {
+            fillBlock(Pair(blockSize * (i - 1), 0), Pair(blockSize * i, 0), blockSize)
+        }
+
+        for (j in (1 until 5)) {
+            for (i in (0 until 5)) {
+                fillBlock(Pair(blockSize * i, blockSize * (j - 1)), Pair(blockSize * i, blockSize * j), blockSize)
+            }
+        }
+    }
+
     fun compute() {
         var toProcess = mutableListOf(Pair(0, 0))
 
         while (toProcess.isNotEmpty()) {
             val point = toProcess.removeFirst()
             gridPath.fillPathForPoint(gridValues, point)
-            val neighbours = gridPath.getNotVisitedNeighbours(point)
-            toProcess.addAll(neighbours)
+            gridPath.getNotVisitedNeighbours(point).forEach { neighbour ->
+                if (!toProcess.contains(neighbour)) toProcess.add(neighbour)
+            }
             toProcess =
-                toProcess.distinct()
+                toProcess
                     .sortedBy { gridValues[it.first][it.second] + (gridPath.getMinNeighboursPath(it) ?: 0) }
                     .toMutableList()
         }
