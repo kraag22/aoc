@@ -15,13 +15,6 @@ class Sixteenth : Base() {
         return array
     }
 
-    fun readHeader(data: UIntArray, position: Int) {
-        val version = data[0].getBits(position, 3)
-        val typeId = data[0].getBits(position + 3, 3)
-        println("version: ${version.toString(2)}, $version")
-        println("typeId: ${typeId.toString(2)}, $typeId")
-
-    }
 }
 
 fun String.hexToUInt() = toUInt(16)
@@ -48,5 +41,57 @@ fun UIntArray.getBits(at: Int, bitCount: Int): UInt {
         val firstPart = this[blockNo].getBits(blockAt, blockSize - blockAt)
         val secondPart = this[blockNo + 1].getBits(0, otherBlockBitCount)
         return (firstPart shl otherBlockBitCount) or secondPart
+    }
+}
+
+data class Header(val version: UInt, val typeId: UInt, val bitCount: Int = 6)
+
+open class Message {
+
+    companion object {
+        fun readMessage(data: UIntArray, basePosition: Int): Message {
+            var position = basePosition
+            val header = readHeader(data, basePosition)
+            position += header.bitCount
+            return when (header.typeId) {
+                4.toUInt() -> LiteralValue.readMessage(data, position, header)
+                else -> TODO()
+            }
+        }
+
+        fun readHeader(data: UIntArray, position: Int): Header {
+            val version = data[0].getBits(position, 3)
+            val typeId = data[0].getBits(position + 3, 3)
+            println("version: ${version.toString(2)}, $version")
+            println("typeId: ${typeId.toString(2)}, $typeId")
+            return Header(version, typeId, 6)
+        }
+    }
+}
+
+data class LiteralValue(val value: UInt, val bitCount: Int, val header: Header) : Message() {
+    companion object {
+        fun readMessage(data: UIntArray, basePosition: Int, header: Header): LiteralValue {
+            val mask = 0b1111.toUInt()
+            var value = 0.toUInt()
+            var partsNo = 0
+
+            while (true) {
+                val part = data.getBits(basePosition + 5 * partsNo, 5)
+                val continueBit = part.shr(4) and 0b1.toUInt()
+                val partValue = part and mask
+                value = value.shl(4) or partValue
+                if (continueBit == 0.toUInt()) break
+                partsNo++
+            }
+
+            val messageSize = header.bitCount + basePosition + 5 * partsNo
+            val unusedBits = (messageSize).mod(4)
+            return LiteralValue(
+                value = value,
+                bitCount = messageSize + unusedBits,
+                header = header
+            )
+        }
     }
 }

@@ -78,6 +78,33 @@ internal class SixteenthTest {
         val s = Sixteenth()
         val arr = s.parse("D2FE28")
 
-        s.readHeader(arr, 0)
+        Message.readHeader(arr, 0)
+        val header = Header(6.toUInt(), 4.toUInt(), 6)
+        assertThat(LiteralValue.readMessage(arr, 6, header))
+            .isEqualTo(
+                LiteralValue(
+                    value = 2021.toUInt(),
+                    bitCount = 24,
+                    header = header
+                )
+            )
+
+    }
+
+    @Test
+    fun `read message with Message`() {
+        val s = Sixteenth()
+        val arr = s.parse("D2FE28")
+        val message = Message.readMessage(arr, 0)
+        val header = Header(6.toUInt(), 4.toUInt(), 6)
+
+        assertThat(message).isInstanceOf(LiteralValue::class.java)
+        assertThat(message).isEqualTo(
+            LiteralValue(
+                value = 2021.toUInt(),
+                bitCount = 24,
+                header = header
+            )
+        )
     }
 }
