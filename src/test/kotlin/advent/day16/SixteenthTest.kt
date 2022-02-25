@@ -104,7 +104,7 @@ internal class SixteenthTest {
         data[0] = 0b11010010111111101010110001100001.toUInt()
         data[1] = 0b11111000110001100011000000000000.toUInt()
         val message = Message.readMessage(data, 0)
-        val literal = message.first() as LiteralValue
+        val literal = message as LiteralValue
 
         assertThat(literal.value).isEqualTo(8680413139200.toULong())
     }
@@ -116,8 +116,8 @@ internal class SixteenthTest {
         val message = Message.readMessage(arr, 0)
         val header = Header(6.toUInt(), 4.toUInt(), 6)
 
-        assertThat(message.first()).isInstanceOf(LiteralValue::class.java)
-        assertThat(message.first()).isEqualTo(
+        assertThat(message).isInstanceOf(LiteralValue::class.java)
+        assertThat(message).isEqualTo(
             LiteralValue(
                 value = 2021.toULong(),
                 bitCount = 21,
@@ -132,12 +132,12 @@ internal class SixteenthTest {
         val arr = s.parse("38006F45291200")
         val messages = Message.readMessage(arr, 0)
 
-        assertThat(messages.first()).isInstanceOf(Operator::class.java)
-        assertThat((messages.first() as Operator).bitCount).isEqualTo(22)
-        assertThat(messages).hasSize(3)
-        assertThat((messages[1] as LiteralValue).value).isEqualTo(10.toULong())
-        assertThat((messages[2] as LiteralValue).value).isEqualTo(20.toULong())
-        assertThat(messages.fold(0) { acc, it -> acc + it.bitCount }).isEqualTo(49)
+        assertThat(messages).isInstanceOf(Operator::class.java)
+        assertThat((messages as Operator).bitCount).isEqualTo(22)
+        assertThat(messages.subPackets).hasSize(2)
+        assertThat((messages.subPackets[0] as LiteralValue).value).isEqualTo(10.toULong())
+        assertThat((messages.subPackets[1] as LiteralValue).value).isEqualTo(20.toULong())
+        assertThat(messages.getSize()).isEqualTo(49)
         assertThat(arr.getBits(49, 7)).isEqualTo(0.toUInt())
     }
 
@@ -145,16 +145,16 @@ internal class SixteenthTest {
     fun `read operator message with lengthNo set`() {
         val s = Sixteenth()
         val arr = s.parse("EE00D40C823060")
-        val messages = Message.readMessage(arr, 0)
+        val message = Message.readMessage(arr, 0)
 
-        assertThat(messages.first()).isInstanceOf(Operator::class.java)
-        assertThat((messages.first() as Operator).bitCount).isEqualTo(18)
-        assertThat(messages).hasSize(4)
+        assertThat(message).isInstanceOf(Operator::class.java)
+        assertThat((message as Operator).bitCount).isEqualTo(18)
+        assertThat(message.subPackets).hasSize(3)
 
-        assertThat((messages[1] as LiteralValue).value).isEqualTo(1.toULong())
-        assertThat((messages[2] as LiteralValue).value).isEqualTo(2.toULong())
-        assertThat((messages[3] as LiteralValue).value).isEqualTo(3.toULong())
-        assertThat(messages.fold(0) { acc, it -> acc + it.bitCount }).isEqualTo(51)
+        assertThat((message.subPackets[0] as LiteralValue).value).isEqualTo(1.toULong())
+        assertThat((message.subPackets[1] as LiteralValue).value).isEqualTo(2.toULong())
+        assertThat((message.subPackets[2] as LiteralValue).value).isEqualTo(3.toULong())
+        assertThat(message.getSize()).isEqualTo(51)
         assertThat(arr.getBits(51, 5)).isEqualTo(0.toUInt())
     }
 
@@ -162,16 +162,12 @@ internal class SixteenthTest {
     fun `read operator message with operator inside`() {
         val s = Sixteenth()
         val arr = s.parse("8A004A801A8002F478")
-        val messages = Message.readMessage(arr, 0)
+        val message = Message.readMessage(arr, 0) as Operator
 
-        assertThat(messages[0]).isInstanceOf(Operator::class.java)
-        assertThat(messages[1]).isInstanceOf(Operator::class.java)
-        assertThat(messages[2]).isInstanceOf(Operator::class.java)
-        assertThat(messages[3]).isInstanceOf(LiteralValue::class.java)
+        assertThat(message.subPackets[0]).isInstanceOf(Operator::class.java)
 
-        assertThat(messages).hasSize(4)
-        assertThat(messages.getVersionSum()).isEqualTo(16)
-        assertThat(messages.fold(0) { acc, it -> acc + it.bitCount }).isEqualTo(69)
+        assertThat(message.getVersionSum()).isEqualTo(16)
+        assertThat(message.getSize()).isEqualTo(69)
         assertThat(arr.getBits(72, 2)).isEqualTo(0.toUInt())
     }
 
@@ -179,11 +175,11 @@ internal class SixteenthTest {
     fun `read operator message with subpackets`() {
         val s = Sixteenth()
         val arr = s.parse("620080001611562C8802118E34")
-        val messages = Message.readMessage(arr, 0)
+        val message = Message.readMessage(arr, 0) as Operator
 
-        assertThat(messages).hasSize(7)
-        assertThat(messages.getVersionSum()).isEqualTo(12)
-        assertThat(messages.fold(0) { acc, it -> acc + it.bitCount }).isEqualTo(102)
+        assertThat(message.subPackets).hasSize(2)
+        assertThat(message.getVersionSum()).isEqualTo(12)
+        assertThat(message.getSize()).isEqualTo(102)
         assertThat(arr.getBits(102, 2)).isEqualTo(0.toUInt())
     }
 
@@ -191,11 +187,11 @@ internal class SixteenthTest {
     fun `read operator message with subpackets - different lengths`() {
         val s = Sixteenth()
         val arr = s.parse("C0015000016115A2E0802F182340")
-        val messages = Message.readMessage(arr, 0)
+        val message = Message.readMessage(arr, 0) as Operator
 
-        assertThat(messages).hasSize(7)
-        assertThat(messages.getVersionSum()).isEqualTo(23)
-        assertThat(messages.fold(0) { acc, it -> acc + it.bitCount }).isEqualTo(106)
+        assertThat(message.subPackets).hasSize(2)
+        assertThat(message.getVersionSum()).isEqualTo(23)
+        assertThat(message.getSize()).isEqualTo(106)
         assertThat(arr.getBits(106, 6)).isEqualTo(0.toUInt())
     }
 
@@ -203,11 +199,11 @@ internal class SixteenthTest {
     fun `read 3 operator messages with subpackets`() {
         val s = Sixteenth()
         val arr = s.parse("A0016C880162017C3686B18A3D4780")
-        val messages = Message.readMessage(arr, 0)
+        val message = Message.readMessage(arr, 0) as Operator
 
-        assertThat(messages).hasSize(8)
-        assertThat(messages.getVersionSum()).isEqualTo(31)
-        assertThat(messages.fold(0) { acc, it -> acc + it.bitCount }).isEqualTo(113)
+        assertThat(message.subPackets).hasSize(1)
+        assertThat(message.getVersionSum()).isEqualTo(31)
+        assertThat(message.getSize()).isEqualTo(113)
         assertThat(arr.getBits(113, 7)).isEqualTo(0.toUInt())
     }
 

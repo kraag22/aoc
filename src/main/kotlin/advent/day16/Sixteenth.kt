@@ -52,21 +52,21 @@ fun UIntArray.getBits(at: Int, bitCount: Int): UInt {
     }
 }
 
-fun List<Message>.getVersionSum() = sumOf { it.header.version }.toInt()
-
 data class Header(val version: UInt, val typeId: UInt, val bitCount: Int = 6)
 
 sealed class Message {
     abstract val bitCount: Int
     abstract val header: Header
+    abstract fun getSize(): Int
+    abstract fun getVersionSum(): Int
 
     companion object {
-        fun readMessage(data: UIntArray, basePosition: Int): List<Message> {
+        fun readMessage(data: UIntArray, basePosition: Int): Message {
             var position = basePosition
             val header = readHeader(data, basePosition)
             position += header.bitCount
             return when (header.typeId) {
-                4.toUInt() -> listOf(LiteralValue.readMessage(data, position, header))
+                4.toUInt() -> LiteralValue.readMessage(data, position, header)
                 else -> Operator.readMessage(data, position, header)
             }
         }
@@ -81,6 +81,14 @@ sealed class Message {
 }
 
 data class LiteralValue(val value: ULong, override val bitCount: Int, override val header: Header) : Message() {
+    override fun getSize(): Int {
+        return bitCount
+    }
+
+    override fun getVersionSum(): Int {
+        return header.version.toInt()
+    }
+
     companion object {
         fun readMessage(data: UIntArray, basePosition: Int, header: Header): LiteralValue {
             val mask = 0b1111.toUInt()
@@ -110,9 +118,19 @@ data class LiteralValue(val value: ULong, override val bitCount: Int, override v
     }
 }
 
-data class Operator(override val bitCount: Int, override val header: Header) : Message() {
+data class Operator(override val bitCount: Int, override val header: Header, val subPackets: List<Message>) :
+    Message() {
+
+    override fun getSize(): Int {
+        return bitCount + subPackets.sumOf { it.getSize() }
+    }
+
+    override fun getVersionSum(): Int {
+        return (header.version.toInt() + subPackets.sumOf { it.getVersionSum() })
+    }
+
     companion object {
-        fun readMessage(data: UIntArray, basePosition: Int, header: Header): List<Message> {
+        fun readMessage(data: UIntArray, basePosition: Int, header: Header): Message {
             var position = basePosition
             var lengthTypeSize = 0
             val subPackets = mutableListOf<Message>()
@@ -124,14 +142,12 @@ data class Operator(override val bitCount: Int, override val header: Header) : M
                 lengthTypeSize = 15
                 var subPacketsSize = 0
                 while (subPacketsSize < subPacketsMaxSizeBits.toInt()) {
-                    val messages = Message.readMessage(data, position)
-                    val newMessagesSize = messages.fold(0) { acc, it ->
-                        acc + it.bitCount
-                    }
+                    val message = Message.readMessage(data, position)
+                    val newMessagesSize = message.getSize()
 
                     subPacketsSize += newMessagesSize
                     position += newMessagesSize
-                    subPackets += messages
+                    subPackets += message
                 }
             } else {
                 val subPacketsNo = data.getBits(position, 11)
@@ -140,15 +156,13 @@ data class Operator(override val bitCount: Int, override val header: Header) : M
                 position += 11
                 lengthTypeSize = 11
                 repeat(subPacketsNo.toInt()) {
-                    val messages = Message.readMessage(data, position)
-                    position += messages.fold(0) { acc, it ->
-                        acc + it.bitCount
-                    }
-                    subPackets += messages
+                    val message = Message.readMessage(data, position)
+                    position += message.getSize()
+                    subPackets += message
                 }
 
             }
-            return listOf(Operator(header.bitCount + 1 + lengthTypeSize, header)) + subPackets
+            return Operator(header.bitCount + 1 + lengthTypeSize, header, subPackets)
         }
     }
 }
