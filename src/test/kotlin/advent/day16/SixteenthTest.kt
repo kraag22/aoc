@@ -211,7 +211,72 @@ internal class SixteenthTest {
     fun `read input message`() {
         val s = Sixteenth()
         val arr = s.load("/16.txt")
+        val message = Message.readMessage(arr, 0)
+        assertThat(message.getVersionSum()).isEqualTo(906)
+        assertThat(message.getValue()).isEqualTo(819324480368)
+    }
+
+    @Test
+    fun `compute sum operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("C200B40A82")
         val messages = Message.readMessage(arr, 0)
-        assertThat(messages.getVersionSum()).isEqualTo(906)
+        assertThat(messages.getValue()).isEqualTo(3)
+    }
+
+    @Test
+    fun `compute product operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("04005AC33890")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(54)
+    }
+
+    @Test
+    fun `compute min operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("880086C3E88112")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(7)
+    }
+
+    @Test
+    fun `compute max operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("CE00C43D881120")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(9)
+    }
+
+    @Test
+    fun `compute less operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("D8005AC2A8F0")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(1)
+    }
+
+    @Test
+    fun `compute greater operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("F600BC2D8F")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(0)
+    }
+
+    @Test
+    fun `compute equal operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("9C005AC2F8F0")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(0)
+    }
+
+    @Test
+    fun `compute multiple operation`() {
+        val s = Sixteenth()
+        val arr = s.parse("9C0141080250320F1802104A08")
+        val messages = Message.readMessage(arr, 0)
+        assertThat(messages.getValue()).isEqualTo(1)
     }
 }

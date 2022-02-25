@@ -3,6 +3,7 @@
 package advent.day16
 
 import advent.Base
+import java.math.BigInteger
 import kotlin.math.ceil
 
 class Sixteenth : Base() {
@@ -41,7 +42,6 @@ fun UIntArray.getBits(at: Int, bitCount: Int): UInt {
 
     val blockNo = at.floorDiv(blockSize)
     val blockAt = at.mod(blockSize)
-    println("${this[blockNo].toPrint()} [$blockNo]")
     return if (blockAt + bitCount <= blockSize) {
         this[blockNo].getBits(blockAt, bitCount)
     } else {
@@ -59,6 +59,7 @@ sealed class Message {
     abstract val header: Header
     abstract fun getSize(): Int
     abstract fun getVersionSum(): Int
+    abstract fun getValue(): BigInteger
 
     companion object {
         fun readMessage(data: UIntArray, basePosition: Int): Message {
@@ -74,7 +75,6 @@ sealed class Message {
         fun readHeader(data: UIntArray, position: Int): Header {
             val version = data.getBits(position, 3)
             val typeId = data.getBits(position + 3, 3)
-            println("Header[$position], version:${version}, typeId: ${typeId}")
             return Header(version, typeId, 6)
         }
     }
@@ -87,6 +87,10 @@ data class LiteralValue(val value: ULong, override val bitCount: Int, override v
 
     override fun getVersionSum(): Int {
         return header.version.toInt()
+    }
+
+    override fun getValue(): BigInteger {
+        return value.toLong().toBigInteger()
     }
 
     companion object {
@@ -107,7 +111,6 @@ data class LiteralValue(val value: ULong, override val bitCount: Int, override v
             require(partsNo < 16) { "Maximum value is 64 bits, cannot store: ${(partsNo) * 4} bits" }
 
             val messageSize = header.bitCount + 5 * partsNo
-            println("LiteralValue[${basePosition}] value:$value, size:$messageSize")
 
             return LiteralValue(
                 value = value,
@@ -129,6 +132,36 @@ data class Operator(override val bitCount: Int, override val header: Header, val
         return (header.version.toInt() + subPackets.sumOf { it.getVersionSum() })
     }
 
+    override fun getValue(): BigInteger {
+        return when (header.typeId.toInt()) {
+            0 -> {
+                subPackets.sumOf { it.getValue() }
+            }
+            1 -> {
+                subPackets.fold(BigInteger.ONE) { acc, message -> acc * message.getValue() }
+            }
+            2 -> {
+                subPackets.minOf { it.getValue() }
+            }
+            3 -> {
+                subPackets.maxOf { it.getValue() }
+            }
+            5 -> {
+                check(subPackets.size == 2) { "5 operation - has to have only two subPackets" }
+                if (subPackets.first().getValue() > subPackets.last().getValue()) BigInteger.ONE else BigInteger.ZERO
+            }
+            6 -> {
+                check(subPackets.size == 2) { "6 operation - has to have only two subPackets" }
+                if (subPackets.first().getValue() < subPackets.last().getValue()) BigInteger.ONE else BigInteger.ZERO
+            }
+            7 -> {
+                check(subPackets.size == 2) { "7 operation - has to have only two subPackets" }
+                if (subPackets.first().getValue() == subPackets.last().getValue()) BigInteger.ONE else BigInteger.ZERO
+            }
+            else -> throw Exception("Unimplemented method ${header.typeId}")
+        }
+    }
+
     companion object {
         fun readMessage(data: UIntArray, basePosition: Int, header: Header): Message {
             var position = basePosition
@@ -137,7 +170,6 @@ data class Operator(override val bitCount: Int, override val header: Header, val
             val lengthTypeId = data.getBits(position++, 1)
             if (lengthTypeId == 0.toUInt()) {
                 val subPacketsMaxSizeBits = data.getBits(position, 15)
-                println("Operator[$basePosition], subPacketBits: ${subPacketsMaxSizeBits.toString(2)} (${subPacketsMaxSizeBits.toInt()})")
                 position += 15
                 lengthTypeSize = 15
                 var subPacketsSize = 0
@@ -151,8 +183,6 @@ data class Operator(override val bitCount: Int, override val header: Header, val
                 }
             } else {
                 val subPacketsNo = data.getBits(position, 11)
-                println("Operator[$basePosition], subPacketNo: ${subPacketsNo.toString(2)} (${subPacketsNo.toInt()})")
-
                 position += 11
                 lengthTypeSize = 11
                 repeat(subPacketsNo.toInt()) {
