@@ -3,6 +3,14 @@ package advent.day18
 import advent.Base
 
 class Eighteenth : Base() {
+    val fishes = mutableListOf<Snailfish>()
+
+    override fun parseAndStore(lines: List<String>) {
+        lines.forEach {
+            fishes.add(parse(it))
+        }
+    }
+
     fun parse(input: String, previous: Snailfish? = null): Snailfish {
         val snailfish = Snailfish(previous)
         if (!input.contains(',')) {
@@ -29,6 +37,32 @@ class Eighteenth : Base() {
 
         throw Exception("Unexpected end of parsing")
     }
+
+    fun process(verbose: Boolean = true): Snailfish {
+        var processing = fishes.first()
+
+        fishes.drop(1).forEach { fish ->
+            println(processing.print())
+            print("+ ")
+            println(fish.print())
+            processing = add(processing, fish)
+            processing.reduce(verbose)
+
+            print("= ")
+            println(processing.print())
+        }
+
+        return processing
+    }
+
+    fun add(a: Snailfish, b: Snailfish): Snailfish {
+        val new = Snailfish(null)
+        a.parent = new
+        b.parent = new
+        new.value = null
+        new.pair = Pair(a, b)
+        return new
+    }
 }
 
 class Snailfish {
@@ -54,9 +88,14 @@ class Snailfish {
         parent = _previous
     }
 
-    fun setValue(_v: Long) {
+    fun makeValue(_v: Long) {
         value = _v
         pair = null
+    }
+
+    fun makePair(_p: Pair<Snailfish, Snailfish>) {
+        value = null
+        pair = _p
     }
 
     private fun increaseValue(increase: Long) {
@@ -74,8 +113,26 @@ class Snailfish {
         }
     }
 
-    fun explode(): Boolean {
+    fun reduce(verbose: Boolean = true) {
+        var didExplode = true
+        var didSplit = true
+
+        while (didExplode || didSplit) {
+            didExplode = explode(verbose)
+            if (!didExplode) {
+                didSplit = split(verbose)
+            }
+            if (!verbose) {
+                if (didExplode) println("explode ")
+                if (didSplit) println("split ")
+                println(print())
+            }
+        }
+    }
+
+    fun explode(verbose: Boolean = true): Boolean {
         val toExplode = getExploding() ?: return false
+        if (!verbose) print("${toExplode.print()} ")
         val increaseLeft =
             toExplode.pair?.first?.value ?: throw Exception("Value cannot be empty for fish: ${toExplode.print()}")
         val increaseRight =
@@ -87,13 +144,12 @@ class Snailfish {
         leftNeighbour?.increaseValue(increaseLeft)
         rightNeighbour?.increaseValue(increaseRight)
 
-        toExplode.setValue(0)
+        toExplode.makeValue(0)
         return true
     }
 
     fun getExploding(baseLevel: Int? = null): Snailfish? {
         val level = baseLevel ?: 1
-        check(level < 6) { "Level cannot be that high: $level fish: ${this.print()}" }
         return if (isSingle()) {
             null
         } else {
@@ -122,6 +178,25 @@ class Snailfish {
                 res
             }
         }
+    }
+
+    fun split(verbose: Boolean = true): Boolean {
+        val toBeSplit = getSplitting() ?: return false
+        if (!verbose) print("${toBeSplit.print()} ")
+        val left = toBeSplit!!.value!!.floorDiv(2)
+        val right = toBeSplit!!.value!! - left
+        toBeSplit.makePair(Pair(Snailfish(left, toBeSplit), Snailfish(right, toBeSplit)))
+
+        return true
+    }
+
+    fun getSplitting(): Snailfish? {
+        return if (isSplitting()) {
+            this
+        } else if (isSingle()) {
+            null
+        } else
+            pair?.first?.getSplitting() ?: pair?.second?.getSplitting()
     }
 
     private fun computeNeighbours(goDown: Boolean, goLeft: Boolean, previous: Snailfish): Snailfish? {
@@ -156,5 +231,9 @@ class Snailfish {
         }
     }
 
-    fun isSingle() = value != null
+    private fun isSingle() = value != null
+
+    private fun isSplitting() = isSingle() && value!! >= 10
+
+    private fun lastPair() = pair != null && pair!!.first.isSingle() && pair!!.second.isSingle()
 }

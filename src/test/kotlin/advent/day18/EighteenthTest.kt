@@ -136,4 +136,124 @@ internal class EighteenthTest {
         fish.explode()
         assertThat(fish.print()).isEqualTo("[[3,[2,[8,0]]],[9,[5,[7,0]]]]")
     }
+
+    @Test
+    fun `test get singles to split 1`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[3,[2,[8,0]]],[9,[15,[4,[3,22]]]]]")
+        assertThat(fish.getSplitting()?.print()).isEqualTo("15")
+    }
+
+    @Test
+    fun `test get singles to split 2`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")
+        assertThat(fish.getSplitting()?.print()).isNull()
+    }
+
+    @Test
+    fun `test get singles to split 3`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[23,[2,[8,0]]],[9,[15,[4,[3,22]]]]]")
+        assertThat(fish.getSplitting()?.print()).isEqualTo("23")
+    }
+
+    @Test
+    fun `do split 1`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[23,[2,[8,0]]],[9,[15,[4,[3,22]]]]]")
+        fish.split()
+        assertThat(fish.print()).isEqualTo("[[[11,12],[2,[8,0]]],[9,[15,[4,[3,22]]]]]")
+    }
+
+    @Test
+    fun `do split 2`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[3,[2,[8,0]]],[9,[15,[4,[3,22]]]]]")
+        fish.split()
+        assertThat(fish.print()).isEqualTo("[[3,[2,[8,0]]],[9,[[7,8],[4,[3,22]]]]]")
+    }
+
+    @Test
+    fun `do split 3`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")
+        assertThat(fish.split()).isFalse
+        assertThat(fish.print()).isEqualTo("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")
+    }
+
+    @Test
+    fun `do reduce`() {
+        val e = Eighteenth()
+        val fish = e.parse("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]")
+        fish.reduce()
+        assertThat(fish.print()).isEqualTo("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]")
+    }
+
+    @Test
+    fun `process example 1`() {
+        val e = Eighteenth()
+        e.fishes.add(e.parse("[1,1]"))
+        e.fishes.add(e.parse("[2,2]"))
+        e.fishes.add(e.parse("[3,3]"))
+        e.fishes.add(e.parse("[4,4]"))
+
+        assertThat(e.process().print())
+            .isEqualTo("[[[[1,1],[2,2]],[3,3]],[4,4]]")
+    }
+
+    @Test
+    fun `process example 2`() {
+        val e = Eighteenth()
+        e.fishes.add(e.parse("[1,1]"))
+        e.fishes.add(e.parse("[2,2]"))
+        e.fishes.add(e.parse("[3,3]"))
+        e.fishes.add(e.parse("[4,4]"))
+        e.fishes.add(e.parse("[5,5]"))
+
+        assertThat(e.process().print())
+            .isEqualTo("[[[[3,0],[5,3]],[4,4]],[5,5]]")
+    }
+
+    @Test
+    fun `process example 3`() {
+        val e = Eighteenth()
+        e.fishes.add(e.parse("[1,1]"))
+        e.fishes.add(e.parse("[2,2]"))
+        e.fishes.add(e.parse("[3,3]"))
+        e.fishes.add(e.parse("[4,4]"))
+        e.fishes.add(e.parse("[5,5]"))
+        e.fishes.add(e.parse("[6,6]"))
+
+        assertThat(e.process().print())
+            .isEqualTo("[[[[5,0],[7,4]],[5,5]],[6,6]]")
+    }
+
+    @Test
+    fun `process example 4`() {
+        val e = Eighteenth()
+        e.fishes.add(e.parse("[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]"))
+        e.fishes.add(e.parse("[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]"))
+
+        assertThat(e.process(false).print())
+            .isEqualTo("[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]")
+    }
+
+    @Test
+    fun `process example data 2`() {
+        val e = Eighteenth()
+        e.extract("/18_example2.txt")
+
+        assertThat(e.process(false).print())
+            .isEqualTo("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]")
+    }
+
+    @Test
+    fun `process example data`() {
+        val e = Eighteenth()
+        e.extract("/18_example.txt")
+
+        assertThat(e.process().print())
+            .isEqualTo("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]")
+    }
 }
