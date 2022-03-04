@@ -4,15 +4,17 @@ import advent.Base
 
 class Eighteenth : Base() {
     val fishes = mutableListOf<Snailfish>()
+    val inputLines = mutableListOf<String>()
 
     override fun parseAndStore(lines: List<String>) {
         lines.forEach {
             fishes.add(parse(it))
         }
+        inputLines.addAll(lines)
     }
 
     fun parse(input: String, previous: Snailfish? = null): Snailfish {
-        val snailfish = Snailfish(previous)
+        val snailfish = Snailfish(null, null, previous)
         if (!input.contains(',')) {
             snailfish.value = input.toLong()
             return snailfish
@@ -42,21 +44,42 @@ class Eighteenth : Base() {
         var processing = fishes.first()
 
         fishes.drop(1).forEach { fish ->
-            println(processing.print())
-            print("+ ")
-            println(fish.print())
+            if (!verbose) {
+                println(processing.print())
+                print("+ ")
+                println(fish.print())
+            }
             processing = add(processing, fish)
             processing.reduce(verbose)
-
-            print("= ")
-            println(processing.print())
+            if (!verbose) {
+                print("= ")
+                println(processing.print())
+            }
         }
 
         return processing
     }
 
+    fun processPairs(): Long {
+        val results = mutableListOf<Long>()
+        val data = inputLines
+        data.forEach { l ->
+            data.forEach { l2 ->
+                // we need clean new object for every reducing
+                val secondFish = parse(l2)
+                val firstFish = parse(l)
+                val reduced = add(firstFish, secondFish).also {
+                    it.reduce()
+                }
+                val magnitude = reduced.getMagnitude()
+                results.add(magnitude)
+            }
+        }
+        return results.maxOf { it }
+    }
+
     fun add(a: Snailfish, b: Snailfish): Snailfish {
-        val new = Snailfish(null)
+        val new = Snailfish(null, null, null)
         a.parent = new
         b.parent = new
         new.value = null
@@ -65,29 +88,11 @@ class Eighteenth : Base() {
     }
 }
 
-class Snailfish {
-    var value: Long? = null
-    var pair: Pair<Snailfish, Snailfish>? = null
-    var parent: Snailfish? = null
-
-    constructor(_previous: Snailfish?) {
-        value = null
-        pair = null
-        parent = _previous
-    }
-
-    constructor(_value: Long, _previous: Snailfish?) {
-        value = _value
-        pair = null
-        parent = _previous
-    }
-
-    constructor(_pair: Pair<Snailfish, Snailfish>, _previous: Snailfish?) {
-        value = null
-        pair = _pair
-        parent = _previous
-    }
-
+data class Snailfish(
+    var value: Long?,
+    var pair: Pair<Snailfish, Snailfish>?,
+    var parent: Snailfish?
+) {
     fun makeValue(_v: Long) {
         value = _v
         pair = null
@@ -185,7 +190,7 @@ class Snailfish {
         if (!verbose) print("${toBeSplit.print()} ")
         val left = toBeSplit!!.value!!.floorDiv(2)
         val right = toBeSplit!!.value!! - left
-        toBeSplit.makePair(Pair(Snailfish(left, toBeSplit), Snailfish(right, toBeSplit)))
+        toBeSplit.makePair(Pair(Snailfish(left, null, toBeSplit), Snailfish(right, null, toBeSplit)))
 
         return true
     }
@@ -197,6 +202,15 @@ class Snailfish {
             null
         } else
             pair?.first?.getSplitting() ?: pair?.second?.getSplitting()
+    }
+
+    fun getMagnitude(): Long {
+        return if (isLastPair()) {
+            3 * pair!!.first.value!! + 2 * pair!!.second.value!!
+        } else if (isSingle()) {
+            value!!
+        } else
+            3 * pair!!.first.getMagnitude() + 2 * pair!!.second.getMagnitude()
     }
 
     private fun computeNeighbours(goDown: Boolean, goLeft: Boolean, previous: Snailfish): Snailfish? {
@@ -216,7 +230,7 @@ class Snailfish {
     }
 
     private fun go(to: Snailfish, goLeft: Boolean, previous: Snailfish): Snailfish? {
-        return if (to == previous) {
+        return if (to === previous) {
             null
         } else {
             to.getNeighbour(false, goLeft, this)
@@ -231,9 +245,14 @@ class Snailfish {
         }
     }
 
+    override fun toString(): String {
+        val msg = if (value != null && isLastPair()) "lastPair" else "pair"
+        return "Fish($value, $msg, $parent)"
+    }
+
     private fun isSingle() = value != null
 
     private fun isSplitting() = isSingle() && value!! >= 10
 
-    private fun lastPair() = pair != null && pair!!.first.isSingle() && pair!!.second.isSingle()
+    private fun isLastPair() = pair != null && pair!!.first.isSingle() && pair!!.second.isSingle()
 }

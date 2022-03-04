@@ -235,7 +235,7 @@ internal class EighteenthTest {
         e.fishes.add(e.parse("[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]"))
         e.fishes.add(e.parse("[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]"))
 
-        assertThat(e.process(false).print())
+        assertThat(e.process().print())
             .isEqualTo("[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]")
     }
 
@@ -244,8 +244,10 @@ internal class EighteenthTest {
         val e = Eighteenth()
         e.extract("/18_example2.txt")
 
-        assertThat(e.process(false).print())
+        val result = e.process()
+        assertThat(result.print())
             .isEqualTo("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]")
+        assertThat(result.getMagnitude()).isEqualTo(3488)
     }
 
     @Test
@@ -253,7 +255,55 @@ internal class EighteenthTest {
         val e = Eighteenth()
         e.extract("/18_example.txt")
 
-        assertThat(e.process().print())
+        val result = e.process()
+        assertThat(result.print())
             .isEqualTo("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]")
+        assertThat(result.getMagnitude()).isEqualTo(4140)
+    }
+
+    @Test
+    fun `test magnitude`() {
+        val e = Eighteenth()
+
+        assertThat(e.parse("[9,1]").getMagnitude()).isEqualTo(29)
+        assertThat(e.parse("[1,9]").getMagnitude()).isEqualTo(21)
+        assertThat(e.parse("[[9,1],[1,9]]").getMagnitude()).isEqualTo(129)
+        assertThat(e.parse("[[1,2],[[3,4],5]]").getMagnitude()).isEqualTo(143)
+        assertThat(e.parse("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]").getMagnitude()).isEqualTo(1384)
+        assertThat(e.parse("[[[[1,1],[2,2]],[3,3]],[4,4]]").getMagnitude()).isEqualTo(445)
+        assertThat(e.parse("[[[[3,0],[5,3]],[4,4]],[5,5]]").getMagnitude()).isEqualTo(791)
+        assertThat(e.parse("[[[[5,0],[7,4]],[5,5]],[6,6]]").getMagnitude()).isEqualTo(1137)
+        assertThat(e.parse("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]").getMagnitude()).isEqualTo(3488)
+    }
+
+    @Test
+    fun `process input data`() {
+        val e = Eighteenth()
+        e.extract("/18.txt")
+
+        val result = e.process()
+        assertThat(result.print())
+            .isEqualTo("[[[[7,0],[7,7]],[[7,7],[7,7]]],[[[7,7],[8,7]],[[7,7],[7,6]]]]")
+        assertThat(result.getMagnitude()).isEqualTo(4017)
+    }
+
+    @Test
+    fun `process pairs on  example data 2`() {
+        val e = Eighteenth()
+        e.extract("/18_example.txt")
+
+        val result = e.processPairs()
+
+        assertThat(result).isEqualTo(3993)
+    }
+
+    @Test
+    fun `process pairs on input data`() {
+        val e = Eighteenth()
+        e.extract("/18.txt")
+
+        val result = e.processPairs()
+
+        assertThat(result).isEqualTo(4583)
     }
 }
