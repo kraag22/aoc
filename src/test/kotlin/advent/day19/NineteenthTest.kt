@@ -234,12 +234,18 @@ internal class NineteenthTest {
     }
 
     @Test
-    fun `join whole space together`() {
+    fun `join whole space together on example data`() {
         val n = Nineteenth()
         n.extract("/19_example.txt")
         n.joinAreasTogether()
         assertThat(n.scanners.getValue(0)).hasSize(79)
     }
 
-
+    @Test
+    fun `join whole space together on input data`() {
+        val n = Nineteenth()
+        n.extract("/19.txt")
+        n.joinAreasTogether()
+        assertThat(n.scanners.getValue(0)).hasSize(398)
+    }
 }

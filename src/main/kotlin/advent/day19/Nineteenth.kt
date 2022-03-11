@@ -61,12 +61,10 @@ class Nineteenth : Base() {
 
         while (areas.isNotEmpty()) {
             areas.forEach { toAdd ->
-                println(toAdd)
                 if (tryToAddScannerArea(baseArea, toAdd)) {
                     joinedAreas.add(toAdd)
                 }
             }
-            println("Joined areas: $joinedAreas")
             areas.removeAll(joinedAreas)
         }
 
