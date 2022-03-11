@@ -48,7 +48,6 @@ internal class NineteenthTest {
 
         var sum = 0
         for (i in (0..24)) {
-            println(n.findSimilarity(i, origDistances, distances))
             if (n.findSimilarity(i, origDistances, distances) != null) {
                 sum++
             }
@@ -247,5 +246,24 @@ internal class NineteenthTest {
         n.extract("/19.txt")
         n.joinAreasTogether()
         assertThat(n.scanners.getValue(0)).hasSize(398)
+        assertThat(n.getLargestManhattanDistance()).isEqualTo(10965)
     }
+
+    @Test
+    fun `get Manhattan distances between two points`() {
+        val result = Triple(1105, -1205, 1229)
+            .manhattanDistanceTo(
+                Triple(-92, -2380, -20)
+            )
+        assertThat(result).isEqualTo(3621)
+    }
+
+    @Test
+    fun `get max manhattan distance on example data`() {
+        val n = Nineteenth()
+        n.extract("/19_example.txt")
+        n.joinAreasTogether()
+        assertThat(n.getLargestManhattanDistance()).isEqualTo(3621)
+    }
+
 }

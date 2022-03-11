@@ -1,6 +1,7 @@
 package advent.day19
 
 import advent.Base
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -8,6 +9,7 @@ typealias Point = Triple<Int, Int, Int>
 
 class Nineteenth : Base() {
     val scanners = mutableMapOf<Int, List<Point>>()
+    val scannersLocation = mutableMapOf<Int, Point>()
 
     override fun parseAndStore(lines: List<String>) {
         val incompleteScannerData = mutableListOf<Point>()
@@ -67,11 +69,24 @@ class Nineteenth : Base() {
             }
             areas.removeAll(joinedAreas)
         }
+    }
 
+    fun getLargestManhattanDistance(): Int {
+        check(scannersLocation.isNotEmpty()) { "Cannot compute Manhattan distances before spaces are joined together" }
+        var max = -1
+
+        scannersLocation.values.forEach { baseLocation ->
+            scannersLocation.values.forEach { otherLocation ->
+                val distance = baseLocation.manhattanDistanceTo(otherLocation)
+                max = maxOf(max, distance)
+            }
+        }
+        return max
     }
 
     fun tryToAddScannerArea(base: Int, toAdd: Int): Boolean {
         val modification = getModificationFor(base, toAdd) ?: return false
+        scannersLocation[toAdd] = modification.getScannerLocation()
         val pointsInBaseCoordinates = scanners.getValue(toAdd).map { it.modify(modification) }
         val allPoints = scanners.getValue(base) + pointsInBaseCoordinates
         scanners[base] = allPoints.distinct()
@@ -118,8 +133,8 @@ class Nineteenth : Base() {
 
         for (i in malformedDistances.keys) {
             // Rounding to INT, verify if that is OK
-            val currPointDistancies = malformedDistances.getValue(i).map { it.second.toInt() }.toSet()
-            if (baseDistances.intersect(currPointDistancies).size > 9) {
+            val currPointDistances = malformedDistances.getValue(i).map { it.second.toInt() }.toSet()
+            if (baseDistances.intersect(currPointDistances).size > 9) {
                 similarities.add(i)
             }
         }
@@ -146,6 +161,10 @@ class Nineteenth : Base() {
             getAxisModificationWithOrderFor(baseZ, others)
         )
     }
+}
+
+fun Triple<AxisModification, AxisModification, AxisModification>.getScannerLocation(): Triple<Int, Int, Int> {
+    return Triple(first.shift, second.shift, third.shift)
 }
 
 fun getAxisModificationWithOrderFor(base: List<Int>, others: List<List<Int>>): AxisModification {
@@ -196,6 +215,10 @@ fun Point.modify(modification: Triple<AxisModification, AxisModification, AxisMo
     val y = modY.perspective.apply(getAxisData(modY.order), modY.shift)
     val z = modZ.perspective.apply(getAxisData(modZ.order), modZ.shift)
     return Point(x, y, z)
+}
+
+fun Point.manhattanDistanceTo(to: Point): Int {
+    return abs(first - to.first) + abs(second - to.second) + abs(third - to.third)
 }
 
 infix fun Point.distance(to: Point): Double {
