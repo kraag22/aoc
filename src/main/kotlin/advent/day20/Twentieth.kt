@@ -26,12 +26,21 @@ class Twentieth : Base() {
         return outputImage
     }
 
-    fun twiceEnhance(): List<List<Char>> {
-        inputImage = enhanceImage().toMutableList()
-        // if zero index of enhancement is #, all the surrounding pixels will be fliped to #. after first run
-        // On second run, we need to count with that
-        if (enhancement.first() == '#') defaultPoint = '#'
-        return enhanceImage()
+    fun enhance(times: Int): List<List<Char>> {
+        var shouldFlipDefaultPoint = false
+        if (enhancement.first() == '#') {
+            check(enhancement.last() == '.') { "Enhancement will fill surrounding area with #" }
+            shouldFlipDefaultPoint = true
+        }
+
+        repeat(times) {
+            inputImage = enhanceImage().toMutableList()
+
+            if (shouldFlipDefaultPoint) {
+                defaultPoint = if (defaultPoint == '.') '#' else '.'
+            }
+        }
+        return inputImage
     }
 
     fun computeOutputPoint(x: Int, y: Int): Char {

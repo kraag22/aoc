@@ -85,9 +85,17 @@ internal class TwentiethTest {
         val t = Twentieth()
         t.extract("/20_example.txt")
 
-        val enhancedImage = t.twiceEnhance()
+        val enhancedImage = t.enhance(2)
         assertThat(enhancedImage.countHashes()).isEqualTo(35)
+    }
 
+    @Test
+    fun `50x enhance example data`() {
+        val t = Twentieth()
+        t.extract("/20_example.txt")
+
+        val enhancedImage = t.enhance(50)
+        assertThat(enhancedImage.countHashes()).isEqualTo(3351)
     }
 
     @Test
@@ -95,10 +103,16 @@ internal class TwentiethTest {
         val t = Twentieth()
         t.extract("/20.txt")
 
-        val enhancedImage = t.twiceEnhance()
-
-        enhancedImage.print()
-
+        val enhancedImage = t.enhance(2)
         assertThat(enhancedImage.countHashes()).isEqualTo(5306)
+    }
+
+    @Test
+    fun `50x enhance input data`() {
+        val t = Twentieth()
+        t.extract("/20.txt")
+
+        val enhancedImage = t.enhance(50)
+        assertThat(enhancedImage.countHashes()).isEqualTo(17497)
     }
 }
