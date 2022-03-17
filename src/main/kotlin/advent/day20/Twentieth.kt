@@ -5,6 +5,7 @@ import advent.Base
 class Twentieth : Base() {
     var enhancement = listOf<Char>()
     var inputImage = mutableListOf<List<Char>>()
+    var defaultPoint = '.'
     override fun parseAndStore(lines: List<String>) {
         enhancement = lines.first().toList()
 
@@ -15,9 +16,9 @@ class Twentieth : Base() {
 
     fun enhanceImage(): List<List<Char>> {
         val outputImage = mutableListOf<List<Char>>()
-        for (y in (-4..inputImage.yMax + 3)) {
+        for (y in (-1..inputImage.yMax)) {
             val line = mutableListOf<Char>()
-            for (x in (-4..inputImage.xMax + 3)) {
+            for (x in (-1..inputImage.xMax)) {
                 line.add(computeOutputPoint(x, y))
             }
             outputImage.add(line)
@@ -27,6 +28,9 @@ class Twentieth : Base() {
 
     fun twiceEnhance(): List<List<Char>> {
         inputImage = enhanceImage().toMutableList()
+        // if zero index of enhancement is #, all the surrounding pixels will be fliped to #. after first run
+        // On second run, we need to count with that
+        if (enhancement.first() == '#') defaultPoint = '#'
         return enhanceImage()
     }
 
@@ -39,7 +43,7 @@ class Twentieth : Base() {
         val outOfBoundsX = x < 0 || x >= inputImage.xMax
         val outOfBoundsY = y < 0 || y >= inputImage.yMax
         if (outOfBoundsX || outOfBoundsY) {
-            return '.'
+            return defaultPoint
         }
 
         return inputImage[y][x]

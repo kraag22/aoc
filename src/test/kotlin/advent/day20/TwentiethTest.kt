@@ -99,6 +99,6 @@ internal class TwentiethTest {
 
         enhancedImage.print()
 
-        assertThat(enhancedImage.countHashes()).isEqualTo(5288)
+        assertThat(enhancedImage.countHashes()).isEqualTo(5306)
     }
 }
